@@ -14,10 +14,18 @@ function totalTime(recipe) {
   return recipe.prep + recipe.cook;
 }
 
-/** Recipes whose title contains the query (case-insensitive). */
+/** Recipes where every word of the query appears in the title or tags (case-insensitive). */
 function search(query) {
-  const q = query.trim().toLowerCase();
-  return recipes.filter((recipe) => recipe.title.toLowerCase().includes(q));
+  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [];
+  return recipes.filter((recipe) => {
+    const titleLower = recipe.title.toLowerCase();
+    const tagsLower = recipe.tags.map((tag) => tag.toLowerCase());
+    return words.every((word) => {
+      if (titleLower.includes(word)) return true;
+      return tagsLower.some((tag) => tag.includes(word));
+    });
+  });
 }
 
 /** Sort by "title" (default) or "time" (total time). Returns a new array. */
