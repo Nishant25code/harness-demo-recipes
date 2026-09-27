@@ -54,7 +54,14 @@ function homePage(params) {
 }
 
 function recipePage(recipe, params) {
-  const servings = params.get('servings') ? Number(params.get('servings')) : recipe.servings;
+  let servings = recipe.servings;
+  const rawServings = params.get('servings');
+  if (rawServings !== null) {
+    const n = Number(rawServings);
+    if (!isNaN(n) && Number.isInteger(n) && n >= 1 && n <= 50) {
+      servings = n;
+    }
+  }
   const ingredients = scaleIngredients(recipe.ingredients, recipe.servings, servings);
   const steps = recipe.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('\n');
   return layout(
